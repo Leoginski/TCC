@@ -1,0 +1,17 @@
+CREATE TABLE licitacoes (
+numero_licitacao varchar(255) DEFAULT '',
+numero_processo varchar(255) DEFAULT '',
+objeto varchar(255) DEFAULT '',
+modalidade_compra varchar(255) DEFAULT '',
+situacao_licitacao varchar(255) DEFAULT '',
+periodo_licitacao date NOT NULL,
+codigo_orgao_superior varchar(255) DEFAULT '',
+nome_orgao_superior varchar(255) DEFAULT '',
+codigo_orgao varchar(255) DEFAULT '',
+nome_orgao varchar(255) DEFAULT '',
+codigo_ug varchar(255) DEFAULT '',
+nome_ug varchar(255) DEFAULT '',
+municipio varchar(255) DEFAULT '',
+data_publicacaoDOU varchar(255) DEFAULT '',
+data_abertura varchar(255) DEFAULT '',
+valor_licitacao varchar(255) DEFAULT '') ENGINE = InnoDB;

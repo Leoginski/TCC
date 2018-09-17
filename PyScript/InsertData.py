@@ -3,9 +3,15 @@ import pandas as pd
 import pymysql.cursors
 from sqlalchemy import create_engine
 
-
-engine = create_engine("mysql://root:root@localhost/tcc")
+engine = create_engine("mysql://root:root@localhost/tcc?unix_socket=/var/run/mysqld/mysqld.sock")
 con = engine.connect()
+csv_data = pd.read_csv('/home/leoginski/Modelos/TCC/DataSet/201301_Licitaç╞o.csv', sep=';', encoding='latin-1', skiprows=1)
+
+csv_data.replace("\"", "\'")
+
+csv_data.to_sql('licitacoes', con=con, if_exists='append', index=False)
+engine.execute("SELECT * FROM participantes").fetchall()
+con.close()
 
 # connection = pymysql.connect(host='localhost',
 #                              user='root',
@@ -19,12 +25,9 @@ con = engine.connect()
 #     cursor.execute(sql)
 #     connection.commit()
 
-csv_data = pd.read_csv('/home/leoginski/Modelos/TCC/DataSet/201301_LicitaЗ╞o.csv',
-                       sep=';', encoding='latin-1', skiprows=1)
 
 # csv_data.to_csv('../DataSet/teste.csv', sep=';', encoding='utf-8')
 
-csv_data.to_sql(name='licitacoes',con=con,if_exists='append')
 
 # datatables = ['licitacoes', 'participantes']
 # for table in datatables:
@@ -36,5 +39,3 @@ csv_data.to_sql(name='licitacoes',con=con,if_exists='append')
 #             cursor.execute(sql, (filename, 'licitacoes'))
 #     finally:
 #         connection.commit()
-
-con.close()

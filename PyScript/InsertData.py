@@ -16,42 +16,42 @@ def getTable(filename):
 
 def types(x):
     return {
-        'item': {'Código Órgão': pd.int64.int64,
-                 'Nome Órgão': object,
-                 'Código UG': pd.int64.int64,
-                 'Nome UG': object,
-                 'Número Licitação': pd.int64.int64,
-                 'CNPJ Vencedor': object,
-                 'Nome Vencedor': object,
-                 'Número Item': pd.int64.int64,
-                 'Descrição': object,
-                 'Quantidade Item': pd.int64.int64,
-                 'Valor Item': object},
-        'licitacao': {'Número Licitação': pd.int64.int64,
-                      'Número Processo': object,
-                      'Objeto': object,
-                      'Modalidade Compra': object,
-                      'Situação Licitação': object,
-                      'Código Órgão Superior': pd.int64.int64,
-                      'Nome Órgão Superior': object,
-                      'Código Órgão': pd.int64.int64,
-                      'Nome Órgão': object,
-                      'Código UG': pd.int64.int64,
-                      'Nome UG': object,
-                      'Município': object,
-                      'Data PublicaçãoDOU': object,
-                      'Data Abertura': object,
-                      'Valor Licitação': object},
-        'participante': {'Código Órgão': pd.int64.int64,
-                         'Nome Órgão': object,
-                         'Código UG': pd.int64.int64,
-                         'Nome UG': object,
-                         'Número Licitação': pd.int64.int64,
-                         'Código Item Compra': pd.int64.int64,
-                         'Descrição Item Compra': object,
-                         'CNPJ Participante': object,
-                         'Nome Participante': object,
-                         'Flag Vencedor': object}
+        'item': {'Código Órgão': 'int64',
+                 'Nome Órgão': 'object',
+                 'Código UG': 'int64',
+                 'Nome UG': 'object',
+                 'Número Licitação': 'int64',
+                 'CNPJ Vencedor': 'object',
+                 'Nome Vencedor': 'object',
+                 'Número Item': 'int64',
+                 'Descrição': 'object',
+                 'Quantidade Item': 'int64',
+                 'Valor Item': 'object'},
+        'licitacao': {'Número Licitação': 'int64',
+                      'Número Processo': 'object',
+                      'Objeto': 'object',
+                      'Modalidade Compra': 'object',
+                      'Situação Licitação': 'object',
+                      'Código Órgão Superior': 'int64',
+                      'Nome Órgão Superior': 'object',
+                      'Código Órgão': 'int64',
+                      'Nome Órgão': 'object',
+                      'Código UG': 'int64',
+                      'Nome UG': 'object',
+                      'Município': 'object',
+                      'Data PublicaçãoDOU': 'object',
+                      'Data Abertura': 'object',
+                      'Valor Licitação': 'object'},
+        'participante': {'Código Órgão': 'int64',
+                         'Nome Órgão': 'object',
+                         'Código UG': 'int64',
+                         'Nome UG': 'object',
+                         'Número Licitação': 'int64',
+                         'Código Item Compra': 'object',
+                         'Descrição Item Compra': 'object',
+                         'CNPJ Participante': 'object',
+                         'Nome Participante': 'object',
+                         'Flag Vencedor': 'object'}
     }[x]
 
 
@@ -69,14 +69,19 @@ def getLines(path):
 
 def insert(filename):
     try:
-        data = pd.read_csv('../DataSet/' + filename,
-                           sep=';', encoding='latin-1')
-
         table = getTable(filename)
         columns = types(table)
-        data.to_sql(table, dtype=columns, con=engine, if_exists='append')
-        print('Inserting...' + filename)
-    except:
+        if(not table == 'participante'):
+            data = pd.read_csv('../DataSet/' + filename, dtype=columns,
+                               sep=';', encoding='latin-1')
+
+            # https://www.dataquest.io/blog/pandas-big-data/
+            print('Inserting...' + filename + ' on ' + table)
+            data.to_sql(table, con=engine, if_exists='append')
+            writeFile('doneCSV.txt', filename)
+            print('Done!')
+    except Exception as e:
+        print(e)
         print(filename + ' failed!')
         writeFile('failCSV.txt', filename)
 
@@ -97,7 +102,6 @@ def main():
 
     for filename in files:
         insert(filename)
-        writeFile('doneCSV.txt', filename)
 
     while(hasFails()):
         print('Has fails again...')

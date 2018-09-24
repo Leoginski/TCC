@@ -39,3 +39,38 @@
 
 
 Código Órgão         int64Nome Órgão          objectCódigo UG            int64Nome UG             objectNúmero Licitação     int64CNPJ Vencedor       objectNome Vencedor       objectNúmero Item          int64Descrição           objectQuantidade Item      int64Valor Item          objectdtype: object
+
+
+
+
+{'Número Licitação': 'int64',
+ 'Número Processo': 'object',
+ 'Objeto': 'object',
+ 'Modalidade Compra': 'object',
+ 'Situação Licitação': 'object',
+ 'Código Órgão Superior': 'int64',
+ 'Nome Órgão Superior': 'object',
+ 'Código Órgão': 'int64',
+ 'Nome Órgão': 'object',
+ 'Código UG': 'int64',
+ 'Nome UG': 'object',
+ 'Município': 'object',
+ 'Data PublicaçãoDOU': 'object',
+ 'Data Abertura': 'object',
+ 'Valor Licitação': 'object'}
+
+'Número Licitação': 'int64',
+'Número Processo': 'object',
+'Objeto': 'object',
+'Modalidade Compra': 'object',
+'Situação Licitação': 'object',
+'Código Órgão Superior': 'int64',
+'Nome Órgão Superior': 'object',
+'Código Órgão': 'int64',
+'Nome Órgão': 'object',
+'Código UG': 'int64',
+'Nome UG': 'object',
+'Município': 'object',
+'Data PublicaçãoDOU': 'object',
+'Data Abertura': 'object',
+'Valor Licitação': 'object'}

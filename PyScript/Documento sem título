@@ -1,0 +1,41 @@
+'Código Órgão': bigint(20),
+'Nome Órgão': text,
+'Código UG': bigint(20),
+'Nome UG': text,
+'Número Licitação': bigint(20),
+'Código Item Compra':bigint(20),
+'Descrição Item Compra':text,
+'CNPJ Participante':text,
+'Nome Participante':text,
+'Flag Vencedor':text
+
+'Número Licitação':bigint(20)
+'Número Processo': 	text,
+'Objeto': text,
+'Modalidade Compra':text,
+'Situação Licitação':text,
+'Código Órgão Superior':bigint(20),
+'Nome Órgão Superior':text,
+'Código Órgão':bigint(20),
+'Nome Órgão':text,
+'Código UG':bigint(20),
+'Nome UG':text,
+'Município':text,
+'Data PublicaçãoDOU':text,
+'Data Abertura':text,
+'Valor Licitação':text
+
+'Código Órgão': bigint(20),
+'Nome Órgão': text,
+'Código UG': bigint(20),
+'Nome UG': text,
+'Número Licitação': bigint(20),
+'CNPJ Vencedor': text,
+'Nome Vencedor': text,
+'Número Item': bigint(20),
+'Descrição': text,
+'Quantidade Item': bigint(20),
+'Valor Item': text 
+
+
+Código Órgão         int64Nome Órgão          objectCódigo UG            int64Nome UG             objectNúmero Licitação     int64CNPJ Vencedor       objectNome Vencedor       objectNúmero Item          int64Descrição           objectQuantidade Item      int64Valor Item          objectdtype: object

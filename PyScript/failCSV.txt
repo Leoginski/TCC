@@ -1,0 +1,9 @@
+201704_ParticipantesLicitacao.csv
+201507_ItemLicitacao.csv
+201308_ItemLicitacao.csv
+201601_ParticipantesLicitacao.csv
+201603_ParticipantesLicitacao.csv
+201505_ItemLicitacao.csv
+201609_ItemLicitacao.csv
+201604_ParticipantesLicitacao.csv
+201604_ParticipantesLicitacao.csv

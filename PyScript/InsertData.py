@@ -14,6 +14,47 @@ def getTable(filename):
     return 'licitacao'
 
 
+def types(x):
+    return {
+        'item': {'Código Órgão': pd.int64.int64,
+                 'Nome Órgão': object,
+                 'Código UG': pd.int64.int64,
+                 'Nome UG': object,
+                 'Número Licitação': pd.int64.int64,
+                 'CNPJ Vencedor': object,
+                 'Nome Vencedor': object,
+                 'Número Item': pd.int64.int64,
+                 'Descrição': object,
+                 'Quantidade Item': pd.int64.int64,
+                 'Valor Item': object},
+        'licitacao': {'Número Licitação': pd.int64.int64,
+                      'Número Processo': object,
+                      'Objeto': object,
+                      'Modalidade Compra': object,
+                      'Situação Licitação': object,
+                      'Código Órgão Superior': pd.int64.int64,
+                      'Nome Órgão Superior': object,
+                      'Código Órgão': pd.int64.int64,
+                      'Nome Órgão': object,
+                      'Código UG': pd.int64.int64,
+                      'Nome UG': object,
+                      'Município': object,
+                      'Data PublicaçãoDOU': object,
+                      'Data Abertura': object,
+                      'Valor Licitação': object},
+        'participante': {'Código Órgão': pd.int64.int64,
+                         'Nome Órgão': object,
+                         'Código UG': pd.int64.int64,
+                         'Nome UG': object,
+                         'Número Licitação': pd.int64.int64,
+                         'Código Item Compra': pd.int64.int64,
+                         'Descrição Item Compra': object,
+                         'CNPJ Participante': object,
+                         'Nome Participante': object,
+                         'Flag Vencedor': object}
+    }[x]
+
+
 def writeFile(path, filename):
     f = open(path, 'a')
     f.write(filename + '\r\n')
@@ -30,7 +71,10 @@ def insert(filename):
     try:
         data = pd.read_csv('../DataSet/' + filename,
                            sep=';', encoding='latin-1')
-        data.to_sql(getTable(filename), con=engine, if_exists='append')
+
+        table = getTable(filename)
+        columns = types(table)
+        data.to_sql(table, dtype=columns, con=engine, if_exists='append')
         print('Inserting...' + filename)
     except:
         print(filename + ' failed!')

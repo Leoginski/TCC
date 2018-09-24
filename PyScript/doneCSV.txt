@@ -1,0 +1,4 @@
+201712_Licitacao.csv
+201305_ItemLicitacao.csv
+201702_Licitacao.csv
+201612_Licitacao.csv

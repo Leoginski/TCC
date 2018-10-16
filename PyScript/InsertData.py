@@ -69,17 +69,19 @@ def getLines(path):
 
 def insert(filename):
     try:
+        # filename = '201801_ParticipantesLicitacao.csv'
         table = getTable(filename)
         columns = types(table)
-        if(not table == 'participante'):
-            data = pd.read_csv('../DataSet/' + filename, dtype=columns,
-                               sep=';', encoding='latin-1')
 
-            # https://www.dataquest.io/blog/pandas-big-data/
-            print('Inserting...' + filename + ' on ' + table)
-            data.to_sql(table, con=engine, if_exists='append')
-            writeFile('doneCSV.txt', filename)
-            print('Done!')
+        # https://www.dataquest.io/blog/pandas-big-data/
+        
+        data = pd.read_csv('../DataSet/'+ filename, dtype=columns,
+                           sep=';', encoding='latin-1')
+                           
+        print('Inserting...' + filename + ' on ' + table)
+        data.to_sql(table, con=engine, if_exists='append')
+        writeFile('doneCSV.txt', filename)
+        print('Done!')
     except Exception as e:
         print(e)
         print(filename + ' failed!')
@@ -98,13 +100,16 @@ def hasFails():
 
 def main():
     done = [line.replace('\n', '') for line in getLines('doneCSV.txt')]
+    fail = [line.replace('\n', '') for line in getLines('failCSV.txt')]
     files = [x for x in os.listdir('../DataSet') if x not in done]
+    files = [x for x in files if x not in fail]
 
     for filename in files:
         insert(filename)
 
-    while(hasFails()):
-        print('Has fails again...')
+    # while(hasFails()):
+    #     print('Has fails again...')
+    print('Finish!')
 
 
 main()

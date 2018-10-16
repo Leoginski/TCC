@@ -28,3 +28,16 @@
 201605_ItemLicitacao.csv
 201404_ItemLicitacao.csv
 201312_ItemLicitacao.csv
+201512_ItemLicitacao.csv
+201606_ItemLicitacao.csv
+201508_ItemLicitacao.csv
+201709_ItemLicitacao.csv
+201503_ItemLicitacao.csv
+201607_ItemLicitacao.csv
+201511_ItemLicitacao.csv
+201412_ItemLicitacao.csv
+201710_ItemLicitacao.csv
+201604_ItemLicitacao.csv
+201608_ItemLicitacao.csv
+201402_ItemLicitacao.csv
+201504_ItemLicitacao.csv

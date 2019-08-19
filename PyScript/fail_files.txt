@@ -1,0 +1,4 @@
+Fails:
+Item => 5361091
+Licitacao => 690926
+Participante => 35242192

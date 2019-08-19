@@ -1,0 +1,88 @@
+2019
+ITEM
+Número Licitação
+Número Processo
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+CNPJ Vencedor
+Nome Vencedor
+Número Item
+Descrição
+Quantidade Item
+Valor Item
+
+LICITACAO
+Número Licitação
+Número Processo
+Objeto
+Modalidade Compra
+Situação Licitação
+Código Órgão Superior
+Nome Órgão Superior
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+Município
+Data PublicaçãoDOU
+Data Abertura
+Valor Licitação
+
+PARTICIPANTE
+Número Licitação
+Número Processo
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+Código Item Compra
+Descrição Item Compra
+CNPJ Participante
+Nome Participante
+Flag Vencedor
+
+
+2013
+ITEM
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+Número Licitação
+CNPJ Vencedor
+Nome Vencedor
+Número Item
+Descrição
+Quantidade Item
+Valor Item
+
+LICITACAO
+Número Licitação
+Número Processo
+Objeto
+Modalidade Compra
+Situação Licitação
+Código Órgão Superior
+Nome Órgão Superior
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+Município
+Data PublicaçãoDOU
+Data Abertura
+Valor Licitação
+
+PARTICIPANTE
+Código Órgão
+Nome Órgão
+Código UG
+Nome UG
+Número Licitação
+Código Item Compra
+Descrição Item Compra
+CNPJ Participante
+Nome Participante
+Flag Vencedor

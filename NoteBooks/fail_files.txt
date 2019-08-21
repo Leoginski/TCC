@@ -1,0 +1,5 @@
+Fails:
+201301_ItemLicitação.csv
+Item => 22179
+Licitacao => 0
+Participante => 0

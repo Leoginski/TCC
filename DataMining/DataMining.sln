@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidatePK", "DataMining\ValidatePK.csproj", "{207E0416-79E9-4679-AE78-395F6BE55967}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidatePK", "ValidatePK\ValidatePK.csproj", "{207E0416-79E9-4679-AE78-395F6BE55967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

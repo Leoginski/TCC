@@ -15,7 +15,7 @@ namespace ValidatePK
 
         static void Main(string[] args)
         {
-            CheckPK();
+            //CheckPK();
 
             //CheckColumnExpectedLength("Código Item Compra", 23);
 
@@ -31,21 +31,40 @@ namespace ValidatePK
                     filesByYear.Add(year, new List<string>() { filename });
             }
 
-            foreach (var year in filesByYear)
+            foreach (var year in filesByYear.Skip(1))
             {
-                List<string> yearEvents = new List<string>();
+                IEnumerable<Participante> yearEvents = new List<Participante>();
 
+                Console.WriteLine($"Concating {year.Key}");
                 foreach (var file in year.Value)
                 {
-                    var events = GetEventList(file);
-
-
+                    yearEvents = yearEvents.Concat(GetParticipanteList(file));
                 }
 
+                Console.WriteLine($"Grouping {year.Key}");
+                var yearGroup = yearEvents.GroupBy(x => x.CodItemCompra).ToList();
 
+                Console.WriteLine($"Removing {year.Key}");
+                yearGroup.RemoveAll(x => IsInvalidEvent(x));
 
-                File.WriteAllLines($@"{dataSetPath}{year}_dataser.csv", yearEvents.ToArray());
+                Console.WriteLine($"Writing {year.Key}");
+                using (var fw = new StreamWriter($@"{dataSetPath}{year.Key}_dataset.csv", true))
+                {
+                    foreach (var group in yearGroup)
+                    {
+                        foreach (var participante in group)
+                        {
+                            fw.WriteLine($"{participante.CodItemCompra};{participante.CnpjParticipante}");
+                        }
+                    }
+                }
             }
+        }
+
+        private static bool IsInvalidEvent(IEnumerable<Participante> participantes)
+        {
+            return participantes.Where(x => x.FlagVencedor.ToLower().Equals("sim")).Count() != 1
+                || participantes.Where(x => x.FlagVencedor.ToLower().Equals("não")).Count() < 1;
         }
 
         private static void CheckPK()
@@ -57,30 +76,14 @@ namespace ValidatePK
                 fullList = fullList.Concat<string>(nextMonth);
             }
 
-            var fullCount = fullList.Count();
+            fullList = fullList.ToList();
 
+            var fullCount = fullList.Count();
             var uniqueCount = fullList.Distinct().Count();
 
             if (fullCount != uniqueCount)
             {
                 throw new Exception("A coluna não é PK.");
-            }
-        }
-
-        private static void CheckColumnExpectedLength(string column, int expectedLength)
-        {
-            foreach (var filename in Directory.GetFiles(dataSetPath, @"*Participantes*"))
-            {
-                string[] header = GetHeader(filename);
-                int codItemIndex = GetFieldIndex(header, column);
-
-                var invalidCodItemCompra = File.ReadLines(filename, Encoding.Default).Skip(1)
-                    .First(x => x.Split(delimiter)[codItemIndex].Trim('\"').Length != expectedLength);
-
-                if (!string.IsNullOrEmpty(invalidCodItemCompra))
-                {
-                    throw new Exception($"File: \"{filename}\" contains column \"{column}\" with invalid length.");
-                }
             }
         }
 
@@ -102,16 +105,21 @@ namespace ValidatePK
                     var codItem = fields[codItemIndex].Trim('\"');
                     var cnpj = fields[cnpjIndex].Trim('\"');
 
-                    return (codItem.Length == 23 && !cnpj.Equals("-11"));
+                    return (IsValidEvent(codItem, cnpj));
                 }).Select(x =>
                 {
-                    return $"{x.Split(delimiter)[codItemIndex].Trim('\"')}"; //{fileId}
+                    return $"{x.Split(delimiter)[codItemIndex].Trim('\"')}{fileId}";
                 });
 
             return csv.Distinct();
         }
 
-        private static IEnumerable<Participante> GetEventList(string path)
+        private static bool IsValidEvent(string codItem, string cnpj)
+        {
+            return Regex.Match(codItem, @"\d{21,23}.").Success && !cnpj.Contains("-1");
+        }
+
+        private static IEnumerable<Participante> GetParticipanteList(string path)
         {
             string[] header = GetHeader(path);
 
@@ -121,7 +129,7 @@ namespace ValidatePK
             int cnpjIndex = GetFieldIndex(header, "CNPJ Participante");
             int flagIndex = GetFieldIndex(header, "Flag Vencedor");
 
-            IEnumerable<Participante> csv = File.ReadLines(path, Encoding.Default).Skip(1)
+            IEnumerable<Participante> list = File.ReadLines(path, Encoding.Default).Skip(2)
                 .Select(x =>
                 {
                     var columns = x.Split(delimiter);
@@ -134,7 +142,7 @@ namespace ValidatePK
                     };
                 });
 
-            return csv.Distinct();
+            return list.Where(x => IsValidEvent(x.CodItemCompra, x.CnpjParticipante));
         }
 
         private static string[] GetHeader(string path)

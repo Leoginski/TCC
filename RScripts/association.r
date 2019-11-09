@@ -1,24 +1,27 @@
 #install.packages("arules")
+#install.packages('arulesViz')
 library(arules)
+library('arulesViz')
 
 #getwd()
-print("Loading dataset...")
-#df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\DataSet\\2018_dataset.csv", header= FALSE, sep = ";")
-df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\mpe.csv", header= FALSE, sep = ";")
-print("Dataset Succesfully loaded!")
+#df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\DataSet\\2013_dataset.csv", header= FALSE, sep = ";")
 
-print("Creating transactions...")
+df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\mpeFull.csv", header= FALSE, sep = ";")
 trans <- as(split(df[,"V2"], df[,'V1']), 'transactions')
-print("Transactions created!")
 
 #inspect(trans)
 
-print("Running Apriori...")
-df <- apriori(trans, parameter=list(minlen=3,supp=0.3,conf=0.6,target='rules'))
+df <- apriori(trans, parameter=list(minlen=2,supp=0.3,conf=0.4,target='rules'))
 #df <- apriori(trans, parameter=list(minlen=2,supp=0.05,conf=0.3,target='rules'))
-print("Apriori Success!")
-#summary(df)
+
+summary(df)
 inspect(df)
+
+#plot(df)
+#plot(df, method="grouped")
+plot(df, method="graph", control=list(typle="items"))
+
+
 
 #print("Saving rules...")
 #write(df,
@@ -27,13 +30,3 @@ inspect(df)
 #      quote = TRUE,
 #      row.names = FALSE)
 #print("Finished!")
-
-
-#install.packages('arulesViz')
-#library('arulesViz')
-
-#plot(df)
-
-plot(df, method="graph", control=list(typle="items"))
-
-#plot(df, method="grouped")

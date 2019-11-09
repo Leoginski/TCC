@@ -15,10 +15,30 @@ namespace ValidatePK
 
         static void Main(string[] args)
         {
+            var events = File.ReadAllLines(@"C:\Users\leosm\Documents\Projects\TCC\DataSet\2019_dataset.csv");
+
+            var list = events.Select(x =>
+            {
+                var split = x.Split(';');
+                return new Participante
+                {
+                    CodItemCompra = split[0],
+                    CnpjParticipante = split[1]
+                };
+            });
+
+            var foundOnRules = list.GroupBy(x => x.CodItemCompra)
+                .ToDictionary(x => x.Key, x => x.Select(e => e.CnpjParticipante).ToList())
+                //.Where(x => x.CnpjParticipante.Equals("26889274000177") || x.CnpjParticipante.Equals("30223033000161"))
+                .ToList();
+
+            var filter = foundOnRules.Where(x => x.Value.Contains("26889274000177") && x.Value.Contains("30223033000161")).ToList();
             //CheckPK();
+            //GenerateDataSet();
+        }
 
-            //CheckColumnExpectedLength("Código Item Compra", 23);
-
+        private static void GenerateDataSet()
+        {
             Dictionary<string, List<string>> filesByYear = new Dictionary<string, List<string>>();
 
             foreach (var filename in Directory.GetFiles(dataSetPath, @"*Participantes*"))

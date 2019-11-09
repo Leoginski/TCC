@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunApriori", "RunApriori\Ru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalysingResults", "AnalysingResults\AnalysingResults.csproj", "{C088D5C5-55C9-4055-8283-377E9F56AB89}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSearch", "GoogleSearch\GoogleSearch.csproj", "{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{C088D5C5-55C9-4055-8283-377E9F56AB89}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C088D5C5-55C9-4055-8283-377E9F56AB89}.Release|x64.ActiveCfg = Release|Any CPU
 		{C088D5C5-55C9-4055-8283-377E9F56AB89}.Release|x64.Build.0 = Release|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Debug|x64.Build.0 = Debug|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Release|x64.ActiveCfg = Release|Any CPU
+		{B5110D36-F570-4C65-AB48-84EDBDCCCF6A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

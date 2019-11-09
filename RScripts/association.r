@@ -4,15 +4,15 @@ library(arules)
 library('arulesViz')
 
 #getwd()
-#df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\DataSet\\2013_dataset.csv", header= FALSE, sep = ";")
+df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\DataSet\\2018_dataset.csv", header= FALSE, sep = ";")
 
-df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\mpeFull.csv", header= FALSE, sep = ";")
+#df <- read.table("C:\\Users\\leosm\\Documents\\Projects\\TCC\\mpeFull.csv", header= FALSE, sep = ";")
 trans <- as(split(df[,"V2"], df[,'V1']), 'transactions')
 
 #inspect(trans)
 
-df <- apriori(trans, parameter=list(minlen=2,supp=0.3,conf=0.4,target='rules'))
-#df <- apriori(trans, parameter=list(minlen=2,supp=0.05,conf=0.3,target='rules'))
+#df <- apriori(trans, parameter=list(minlen=2,supp=0.3,conf=0.4,target='rules'))
+df <- apriori(trans, parameter=list(minlen=2,supp=0.03,conf=0.4,target='rules'))
 
 summary(df)
 inspect(df)

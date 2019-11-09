@@ -1,15 +1,19 @@
 ~#~ MPE Sanções Inidoneidade
 http://www.portaltransparencia.gov.br/sancoes/ceis?paginacaoSimples=true&tamanhoPagina=&offset=&direcaoOrdenacao=asc&colunasSelecionadas=linkDetalhamento%2CcpfCnpj%2Cnome%2CufSancionado%2Corgao%2CtipoSancao%2CdataPublicacao&cpfCnpj=24016172000111%2C31876709000189
+
 ~#~ MPE Citado Relatório de Gestão da Petrobras (Formação de Cartel com fornecedores)
 https://dokumen.tips/documents/relatorio-de-gestao-da-petrobras-2014.html
+
 ~#~ Cade MPE CITADO processo administrativo 08700.004617/2013-41 ALSTOM BRASIL ENERGIA E TRANSPORTE LTDA. E OUTROS 
 https://edisciplinas.usp.br/pluginfile.php/4398130/mod_resource/content/0/Nota%20T%C3%A9cnica%2081%202014.pdf
+
 ~#~ Citação Cetest e MPE
 https://www.jusbrasil.com.br/diarios/144833766/dou-secao-1-28-04-2017-pg-72
+https://www.jusbrasil.com.br/diarios/111757593/dou-secao-1-23-03-2016-pg-50?ref=serp
+http://pesquisa.in.gov.br/imprensa/servlet/INPDFViewer?jornal=515&pagina=33&data=04/06/2019&captchafield=firstAccess
+
 ~#~ Punição MPE Controladoria geral da união
 http://www.cgu.gov.br/noticias/2018/06/cgu-pune-empresa-mpe-montagens-com-declaracao-de-inidoneidade
-~#~ Citação Cetest e MPE
-http://pesquisa.in.gov.br/imprensa/servlet/INPDFViewer?jornal=515&pagina=33&data=04/06/2019&captchafield=firstAccess
 ~#~ MPE Diário Oficial da União Inidoneidade
 http://www.in.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/25600934/do1-2018-06-14-decisao-de-11-de-junho-de-2018-25600892
 

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AnalysingResults
 {
@@ -98,29 +98,136 @@ namespace AnalysingResults
         {
             string path = @"C:\Users\leosm\Documents\Projects\TCC\RulesByMonth";
 
-            IEnumerable<AssociationRule> fullRuleSet = new List<AssociationRule>();
 
             for (int year = 2013; year < 2019; year++)
             {
-
                 foreach (var file in Directory.GetFiles($@"{path}\{year}\", "*_rules.csv"))
                 {
+                    IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
                     var list = File.ReadAllLines(file);
-                    fullRuleSet = fullRuleSet.Concat(GetAssociationRules(list, file)).ToList();
+                    string timeStamp = Regex.Match(file, @"(\d{6})_rules").Groups[1].Value;
+
+                    //ruleSet = ruleSet.Concat(GetAssociationRules(list, timeStamp));
+                    ruleSet = GetAssociationRules(list, timeStamp);
+                    ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
+
+                    JournalSearch(ruleSet);
+                    var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
+
+                    if (searched.Count() > 0)
+                    {
+                        SaveResults(searched, timeStamp);
+                    }
                 }
             }
-
-            fullRuleSet = fullRuleSet.OrderBy(x => x.Confidence).ToList();
-
-            var hundredPercent = fullRuleSet.Where(x => x.Confidence >= 1).ToList().OrderBy(x => x.Confidence);
-
-
         }
 
-        private static IEnumerable<AssociationRule> GetAssociationRules(string[] list, string file)
+        private static void SaveResults(IEnumerable<AssociationRule> searched, string timeStamp)
         {
-            int timeStamp = int.Parse(Regex.Match(file, @"(\d{6})_rules").Groups[1].Value);
-            return list.Skip(1).Select(x => ParseAssociationRule(x.Split(';'), timeStamp));
+            using (var fs = new FileStream($@"C:\Users\leosm\Documents\Projects\TCC\RulesByMonthAnalyses\{timeStamp}_result.csv", FileMode.Append))
+            {
+                var fw = new StreamWriter(fs, Encoding.Default);
+
+                fw.WriteLine(
+                    $"Rule;" +
+                    $"Support;" +
+                    $"Confidence;" +
+                    $"Lift;" +
+                    $"Count;" +
+                    $"UsedTerm;" +
+                    $"Url;" +
+                    $"Title;" +
+                    $"Abstract;" +
+                    $"DataPublicacao"
+                );
+
+                foreach (var rule in searched)
+                {
+                    foreach (var result in rule.Results)
+                    {
+                        fw.WriteLine(
+                            $"{rule.Rule};" +
+                            $"{rule.Support};" +
+                            $"{rule.Confidence};" +
+                            $"{rule.Lift};" +
+                            $"{rule.Count};" +
+                            $"{result.UsedTerm};" +
+                            $"{result.Url};" +
+                            $"{result.Title};" +
+                            $"{result.Abstract};" +
+                            $"{result.DataPublicacao}"
+                        );
+                    }
+                }
+            }
+        }
+
+        private static void JournalSearch(IEnumerable<AssociationRule> hundredPercent)
+        {
+            var termos = new List<string>()
+            {
+                "vara+criminal",
+                "condena-se+crime",
+                "venha+ser+condenado",
+                "crime+representantes+penal",
+                "execução+penal",
+                "apelação+criminal",
+                "responsabilidade+penal",
+                "crime+cometido+representante",
+                "crimes+contra",
+                "tcu",
+            };
+
+            var url = "https://www.jusbrasil.com.br/busca?q=";
+            foreach (var association in hundredPercent)
+            {
+                association.Results = new List<SearchResult>();
+
+                foreach (var termo in termos)
+                {
+                    string principal = Regex.Replace(association.Rule.Split('>')[1], @"\D", string.Empty);
+                    string searchTerm = $"{principal}+{termo}";
+
+                    var web = new HtmlWeb();
+                    var doc = web.Load($"{url}{searchTerm}");
+
+                    ParseResults(association, searchTerm, doc);
+                }
+            }
+        }
+
+        private static void ParseResults(AssociationRule association, string searchTerm, HtmlDocument doc)
+        {
+            var nodes = doc.DocumentNode.SelectNodes("//div[@class = 'SearchResults-documents']/div/div");
+            if (nodes != null)
+            {
+                foreach (var node in nodes)
+                {
+                    var nodeTitle = node.SelectSingleNode("./h2/a");
+                    var nodePublicacao = node.SelectSingleNode("./div[@class = 'BaseSnippetWrapper-publisher']/span[@class = 'BaseSnippetWrapper-highlight-date']");
+                    var nodeBody = node.SelectSingleNode("./div[@class = 'BaseSnippetWrapper-body']");
+
+                    var result = new SearchResult
+                    {
+                        Title = nodeTitle.InnerText,
+                        Url = nodeTitle.GetAttributeValue("href", string.Empty),
+                        DataPublicacao = nodePublicacao != null ? nodePublicacao.InnerText.Split(':')[1].Trim() : string.Empty,
+                        Abstract = nodeBody.InnerText,
+                        UsedTerm = searchTerm
+                    };
+
+                    association.Results.Add(result);
+                }
+            }
+            else if (doc.DocumentNode.SelectSingleNode("//span[contains(text(), 'não encontrou nenhum documento')]") == null)
+            {
+                throw new Exception("Erro inesperado, possível bloqueio de IP.");
+            }
+        }
+
+        private static IEnumerable<AssociationRule> GetAssociationRules(string[] list, string timeStamp)
+        {
+            return list.Skip(1).Select(x => ParseAssociationRule(x.Split(';'), int.Parse(timeStamp)));
         }
 
         private static AssociationRule ParseAssociationRule(string[] fields, int timeStamp)

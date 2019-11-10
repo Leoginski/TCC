@@ -14,5 +14,6 @@ namespace AnalysingResults
         public double Lift { get; set; }
         public int Count { get; set; }
         public int TimeStamp { get; set; }
+        public List<SearchResult> Results { get; set; }
     }
 }

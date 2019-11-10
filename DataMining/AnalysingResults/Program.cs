@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,8 @@ namespace AnalysingResults
         static void Main(string[] args)
         {
             //GetDataSetByCNPJ();
-            GetDataSetByMonth();
+            //GetDataSetByMonth();
+            RuleBreakingAnalyses();
         }
 
         private static void GetDataSetByCNPJ()
@@ -90,6 +92,48 @@ namespace AnalysingResults
                     }
                 }
             }
+        }
+
+        private static void RuleBreakingAnalyses()
+        {
+            string path = @"C:\Users\leosm\Documents\Projects\TCC\RulesByMonth";
+
+            IEnumerable<AssociationRule> fullRuleSet = new List<AssociationRule>();
+
+            for (int year = 2013; year < 2019; year++)
+            {
+
+                foreach (var file in Directory.GetFiles($@"{path}\{year}\", "*_rules.csv"))
+                {
+                    var list = File.ReadAllLines(file);
+                    fullRuleSet = fullRuleSet.Concat(GetAssociationRules(list, file)).ToList();
+                }
+            }
+
+            fullRuleSet = fullRuleSet.OrderBy(x => x.Confidence).ToList();
+
+            var hundredPercent = fullRuleSet.Where(x => x.Confidence >= 1).ToList().OrderBy(x => x.Confidence);
+
+
+        }
+
+        private static IEnumerable<AssociationRule> GetAssociationRules(string[] list, string file)
+        {
+            int timeStamp = int.Parse(Regex.Match(file, @"(\d{6})_rules").Groups[1].Value);
+            return list.Skip(1).Select(x => ParseAssociationRule(x.Split(';'), timeStamp));
+        }
+
+        private static AssociationRule ParseAssociationRule(string[] fields, int timeStamp)
+        {
+            return new AssociationRule
+            {
+                Rule = fields[0],
+                Support = double.Parse(fields[1], CultureInfo.InvariantCulture),
+                Confidence = double.Parse(fields[2], CultureInfo.InvariantCulture),
+                Lift = double.Parse(fields[3], CultureInfo.InvariantCulture),
+                Count = int.Parse(fields[4], CultureInfo.InvariantCulture),
+                TimeStamp = timeStamp
+            };
         }
     }
 }

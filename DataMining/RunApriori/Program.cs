@@ -10,7 +10,7 @@ namespace RunApriori
     {
         static void Main(string[] args)
         {
-            var events = File.ReadAllLines(@"C:\Users\leosm\Documents\Projects\TCC\DataSet\2019_dataset.csv");
+            var events = File.ReadAllLines(@"C:\Users\leosm\Documents\Projects\TCC\DataSetByCNPJ\cartelFull.csv");
 
             var list = events.Select(x =>
             {

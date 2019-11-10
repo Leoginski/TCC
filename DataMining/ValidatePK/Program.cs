@@ -15,29 +15,29 @@ namespace ValidatePK
 
         static void Main(string[] args)
         {
-            var events = File.ReadAllLines(@"C:\Users\leosm\Documents\Projects\TCC\DataSet\2019_dataset.csv");
+            //var events = File.ReadAllLines(@"C:\Users\leosm\Documents\Projects\TCC\DataSet\2019_dataset.csv");
 
-            var list = events.Select(x =>
-            {
-                var split = x.Split(';');
-                return new Participante
-                {
-                    CodItemCompra = split[0],
-                    CnpjParticipante = split[1]
-                };
-            });
+            //var list = events.Select(x =>
+            //{
+            //    var split = x.Split(';');
+            //    return new Participante
+            //    {
+            //        CodItemCompra = split[0],
+            //        CnpjParticipante = split[1]
+            //    };
+            //});
 
-            var foundOnRules = list.GroupBy(x => x.CodItemCompra)
-                .ToDictionary(x => x.Key, x => x.Select(e => e.CnpjParticipante).ToList())
-                //.Where(x => x.CnpjParticipante.Equals("26889274000177") || x.CnpjParticipante.Equals("30223033000161"))
-                .ToList();
+            //var foundOnRules = list.GroupBy(x => x.CodItemCompra)
+            //    .ToDictionary(x => x.Key, x => x.Select(e => e.CnpjParticipante).ToList())
+            //    .ToList();
 
-            var filter = foundOnRules.Where(x => x.Value.Contains("26889274000177") && x.Value.Contains("30223033000161")).ToList();
+            //var filter = foundOnRules.Where(x => x.Value.Contains("26889274000177") && x.Value.Contains("30223033000161")).ToList();
             //CheckPK();
-            //GenerateDataSet();
+            //GenerateDataSetByYear();
+            //GenerateDataSetByMonth();
         }
 
-        private static void GenerateDataSet()
+        private static void GenerateDataSetByYear()
         {
             Dictionary<string, List<string>> filesByYear = new Dictionary<string, List<string>>();
 
@@ -80,6 +80,50 @@ namespace ValidatePK
                 }
             }
         }
+
+        //private static void GenerateDataSetByMonth()
+        //{
+        //    Dictionary<string, List<string>> filesByYear = new Dictionary<string, List<string>>();
+
+        //    foreach (var filename in Directory.GetFiles(dataSetPath, @"*Participantes*"))
+        //    {
+        //        var year = Regex.Match(filename, @"(\d{4})\d{2}_").Groups[1].Value;
+
+        //        if (filesByYear.ContainsKey(year))
+        //            filesByYear[year].Add(filename);
+        //        else
+        //            filesByYear.Add(year, new List<string>() { filename });
+        //    }
+
+        //    foreach (var year in filesByYear.Skip(1))
+        //    {
+        //        IEnumerable<Participante> yearEvents = new List<Participante>();
+
+        //        Console.WriteLine($"Concating {year.Key}");
+        //        foreach (var file in year.Value)
+        //        {
+        //            yearEvents = yearEvents.Concat(GetParticipanteList(file));
+        //        }
+
+        //        Console.WriteLine($"Grouping {year.Key}");
+        //        var yearGroup = yearEvents.GroupBy(x => x.CodItemCompra).ToList();
+
+        //        Console.WriteLine($"Removing {year.Key}");
+        //        yearGroup.RemoveAll(x => IsInvalidEvent(x));
+
+        //        Console.WriteLine($"Writing {year.Key}");
+        //        using (var fw = new StreamWriter($@"{dataSetPath}{year.Key}_dataset.csv", true))
+        //        {
+        //            foreach (var group in yearGroup)
+        //            {
+        //                foreach (var participante in group)
+        //                {
+        //                    fw.WriteLine($"{participante.CodItemCompra};{participante.CnpjParticipante}");
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private static bool IsInvalidEvent(IEnumerable<Participante> participantes)
         {

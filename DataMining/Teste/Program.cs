@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System;
-using System.Configuration;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -102,89 +102,61 @@ namespace AnalysingResults
         {
             IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
 
-            foreach (var dir in Directory.GetDirectories(inputPath))
+            for (int year = 2013; year < 2019; year++)
             {
-                foreach (var file in Directory.GetFiles(dir))
+                foreach (var file in Directory.GetFiles($@"{inputPath}\{year}\", "*_rules.csv"))
                 {
+                    //IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
                     var list = File.ReadAllLines(file);
+                    string timeStamp = Regex.Match(file, @"(\d{6})_rules").Groups[1].Value;
 
-                    string timeStamp = Regex.Match(file, @"(\d{6})").Groups[1].Value;
-
+                    //ruleSet = GetAssociationRules(list, timeStamp);
                     ruleSet = ruleSet.Concat(GetAssociationRules(list, timeStamp));
+                    //ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
+
+                    //JournalSearch(ruleSet);
+                    //var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
+
+                    //if (searched.Count() > 0)
+                    //{
+                    //    SaveResults(searched, timeStamp);
+                    //}
                 }
             }
 
-            ruleSet = ruleSet.Where(x => x.Confidence >= 1).ToList();
+            ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
 
-            var grouped = ruleSet.GroupBy(x => x.Principal)
+            var grouped = ruleSet.Where(x => x.Confidence >= 1).GroupBy(x => Regex.Replace(x.Rule.Split('>')[1], @"\D", string.Empty))
                 .ToDictionary(x => x.Key, x => x.Select(e => e).ToList())
                 .ToList();
 
-            Console.WriteLine($"Starting requests with {grouped.Count()} companies.");
+            Console.WriteLine($"Starting requests with {ruleSet.Count()} rules.");
 
-            var resultsByKey = new Dictionary<string, List<SearchResult>>();
+            JournalSearch(ruleSet);
 
-            foreach (var item in grouped)
+            var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
+
+            Console.WriteLine($"TotalResults: {searched.Count()}");
+
+            if (searched.Count() > 0)
             {
-                var result = JournalSearch(item.Key);
-
-                if (result.Count() > 0)
-                {
-                    resultsByKey.Add(key: item.Key, value: result);
-                }
-            }
-
-            var foundCompanies = resultsByKey.Count();
-            Console.WriteLine($"Total Companies on search results: {resultsByKey.Count()}");
-
-            if (resultsByKey.Any(x => x.Value.Count() > 0))
-            {
-                ruleSet = ruleSet.Where(x => resultsByKey.ContainsKey(x.Principal));
-                SaveRules(ruleSet);
-                SaveResults(resultsByKey);
+                SaveResults(searched);
             }
         }
 
-        private static void SaveRules(IEnumerable<AssociationRule> searched)
-        {
-            using (var fs = new FileStream($@"{outputPath}\ruleSet.csv", FileMode.Append))
-            {
-                var fw = new StreamWriter(fs, Encoding.Default);
-
-                fw.WriteLine(
-                    $"Principal;" +
-                    $"TimeStamp;" +
-                    $"Rule;" +
-                    $"Support;" +
-                    $"Confidence;" +
-                    $"Lift;" +
-                    $"Count;"
-                );
-
-                foreach (var rule in searched)
-                {
-                    fw.WriteLine(
-                        $"{rule.Principal};" +
-                        $"{rule.TimeStamp};" +
-                        $"{rule.Rule};" +
-                        $"{rule.Support};" +
-                        $"{rule.Confidence};" +
-                        $"{rule.Lift};" +
-                        $"{rule.Count};"
-
-                    );
-                }
-            }
-        }
-
-        private static void SaveResults(Dictionary<string, List<SearchResult>> foundResults)
+        private static void SaveResults(IEnumerable<AssociationRule> searched)
         {
             using (var fs = new FileStream($@"{outputPath}\result.csv", FileMode.Append))
             {
                 var fw = new StreamWriter(fs, Encoding.Default);
 
                 fw.WriteLine(
-                    $"Principal;" +
+                    $"TimeStamp;" +
+                    $"Rule;" +
+                    $"Support;" +
+                    $"Confidence;" +
+                    $"Lift;" +
+                    $"Count;" +
                     $"UsedTerm;" +
                     $"Url;" +
                     $"Title;" +
@@ -192,26 +164,30 @@ namespace AnalysingResults
                     $"DataPublicacao"
                 );
 
-                foreach (var item in foundResults)
+                foreach (var rule in searched)
                 {
-                    foreach (var result in item.Value)
+                    foreach (var result in rule.Results)
                     {
                         fw.WriteLine(
-                        $"{item.Key};" +
-                        $"{result.UsedTerm};" +
-                        $"{result.Url};" +
-                        $"{result.Title};" +
-                        $"{result.Abstract};" +
-                        $"{result.DataPublicacao}"
+                            $"{rule.TimeStamp};" +
+                            $"{rule.Rule};" +
+                            $"{rule.Support};" +
+                            $"{rule.Confidence};" +
+                            $"{rule.Lift};" +
+                            $"{rule.Count};" +
+                            $"{result.UsedTerm};" +
+                            $"{result.Url};" +
+                            $"{result.Title};" +
+                            $"{result.Abstract};" +
+                            $"{result.DataPublicacao}"
                         );
                     }
                 }
             }
         }
 
-        private static List<SearchResult> JournalSearch(string key)
+        private static void JournalSearch(IEnumerable<AssociationRule> hundredPercent)
         {
-            var url = "https://www.jusbrasil.com.br/busca?q=";
             var termos = new List<string>()
             {
                 "tcu+fraude",
@@ -220,40 +196,35 @@ namespace AnalysingResults
                 "tcu+lavagem",
                 "tcu+conluio",
                 "tcu+cartel",
-                "tcu+crime",
             };
 
-            var results = new List<SearchResult>();
-
-            foreach (var termo in termos)
+            var url = "https://www.jusbrasil.com.br/busca?q=";
+            foreach (var association in hundredPercent)
             {
-                string searchTerm = $"{key}+{termo}";
-                string target = $"{url}{searchTerm}";
-                Console.WriteLine(target);
+                association.Results = new List<SearchResult>();
 
-                DoSearch(results, target, searchTerm);
-            }
+                foreach (var termo in termos)
+                {
+                    string principal = Regex.Replace(association.Rule.Split('>')[1], @"\D", string.Empty);
+                    string searchTerm = $"{principal}+{termo}";
 
-            return results;
-        }
+                    string target = $"{url}{searchTerm}";
+                    Console.WriteLine(target);
 
-        private static void DoSearch(List<SearchResult> results, string target, string searchTerm)
-        {
-            var web = new HtmlWeb();
-            var doc = web.Load(target);
+                    var web = new HtmlWeb();
+                    var doc = web.Load(target);
 
-            if (!ParseResults(results, searchTerm, doc))
-            {
-                DoSearch(results, target, searchTerm);
+                    ParseResults(association, searchTerm, doc);
+                }
             }
         }
 
-        private static bool ParseResults(List<SearchResult> results, string searchTerm, HtmlDocument doc)
+        private static void ParseResults(AssociationRule association, string searchTerm, HtmlDocument doc)
         {
             var nodes = doc.DocumentNode.SelectNodes("//div[@class = 'SearchResults-documents']/div/div");
             if (nodes != null)
             {
-                Console.WriteLine($"{searchTerm}: {nodes.Count()} results");
+                Console.WriteLine($"{association.Rule} - {searchTerm}: {nodes.Count()} results");
 
                 foreach (var node in nodes)
                 {
@@ -270,19 +241,13 @@ namespace AnalysingResults
                         UsedTerm = searchTerm
                     };
 
-                    results.Add(result);
+                    association.Results.Add(result);
                 }
-
-                return true;
             }
-
-            if (doc.DocumentNode.SelectSingleNode("//span[contains(text(), 'não encontrou nenhum documento')]") != null)
-            {
-                Console.WriteLine($"{searchTerm}: 0 results");
-                return true;
-            }
-
-            return false;
+            //else if (doc.DocumentNode.SelectSingleNode("//span[contains(text(), 'não encontrou nenhum documento')]") == null)
+            //{
+            //    throw new Exception("Erro inesperado, possível bloqueio de IP.");
+            //}
         }
 
         private static IEnumerable<AssociationRule> GetAssociationRules(string[] list, string timeStamp)
@@ -292,12 +257,8 @@ namespace AnalysingResults
 
         private static AssociationRule ParseAssociationRule(string[] fields, int timeStamp)
         {
-            var ruleItens = fields[0].Split('>');
-
-            var rule = new AssociationRule
+            return new AssociationRule
             {
-                Principal = Regex.Replace(ruleItens[1], @"\D", string.Empty),
-                Members = ruleItens[0].Split(',').Select(x => Regex.Replace(x, @"\D", string.Empty)).ToArray(),
                 Rule = fields[0],
                 Support = double.Parse(fields[1], CultureInfo.InvariantCulture),
                 Confidence = double.Parse(fields[2], CultureInfo.InvariantCulture),
@@ -305,8 +266,6 @@ namespace AnalysingResults
                 Count = int.Parse(fields[4], CultureInfo.InvariantCulture),
                 TimeStamp = timeStamp
             };
-
-            return rule;
         }
     }
 }

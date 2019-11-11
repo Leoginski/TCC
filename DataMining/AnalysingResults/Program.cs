@@ -179,7 +179,7 @@ namespace AnalysingResults
 
         private static void SaveResults(Dictionary<string, List<SearchResult>> foundResults)
         {
-            using (var fs = new FileStream($@"{outputPath}\result.csv", FileMode.Append))
+            using (var fs = new FileStream($@"{outputPath}\foundResults.csv", FileMode.Append))
             {
                 var fw = new StreamWriter(fs, Encoding.Default);
 

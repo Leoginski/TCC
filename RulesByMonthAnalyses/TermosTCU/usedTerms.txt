@@ -1,0 +1,7 @@
+"tcu+fraude",
+"tcu+licitação",
+"tcu+ilicito",
+"tcu+lavagem",
+"tcu+conluio",
+"tcu+cartel",
+"tcu+crime",

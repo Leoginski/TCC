@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -11,6 +12,9 @@ namespace AnalysingResults
 {
     class Program
     {
+        public static string inputPath = $@"{ConfigurationManager.AppSettings["InputPath"]}";
+        public static string outputPath = $@"{ConfigurationManager.AppSettings["OutputPath"]}";
+
         static void Main(string[] args)
         {
             //GetDataSetByCNPJ();
@@ -96,39 +100,54 @@ namespace AnalysingResults
 
         private static void RuleBreakingAnalyses()
         {
-            string path = @"C:\Users\leosm\Documents\Projects\TCC\RulesByMonth";
-
+            IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
 
             for (int year = 2013; year < 2019; year++)
             {
-                foreach (var file in Directory.GetFiles($@"{path}\{year}\", "*_rules.csv"))
+                foreach (var file in Directory.GetFiles($@"{inputPath}\{year}\", "*_rules.csv"))
                 {
-                    IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
+                    //IEnumerable<AssociationRule> ruleSet = new List<AssociationRule>();
                     var list = File.ReadAllLines(file);
                     string timeStamp = Regex.Match(file, @"(\d{6})_rules").Groups[1].Value;
 
-                    //ruleSet = ruleSet.Concat(GetAssociationRules(list, timeStamp));
-                    ruleSet = GetAssociationRules(list, timeStamp);
-                    ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
+                    //ruleSet = GetAssociationRules(list, timeStamp);
+                    ruleSet = ruleSet.Concat(GetAssociationRules(list, timeStamp));
+                    //ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
 
-                    JournalSearch(ruleSet);
-                    var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
+                    //JournalSearch(ruleSet);
+                    //var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
 
-                    if (searched.Count() > 0)
-                    {
-                        SaveResults(searched, timeStamp);
-                    }
+                    //if (searched.Count() > 0)
+                    //{
+                    //    SaveResults(searched, timeStamp);
+                    //}
                 }
+            }
+
+            ruleSet = ruleSet.Where(x => x.Confidence >= 1).OrderBy(x => x.Support).ToList();
+
+            Console.WriteLine($"Starting requests with {ruleSet.Count()} rules.");
+
+            JournalSearch(ruleSet);
+
+            var searched = ruleSet.Where(x => x.Results != null && x.Results.Count > 0);
+
+            Console.WriteLine($"TotalResults: {searched.Count()}");
+
+            if (searched.Count() > 0)
+            {
+                SaveResults(searched);
             }
         }
 
-        private static void SaveResults(IEnumerable<AssociationRule> searched, string timeStamp)
+        private static void SaveResults(IEnumerable<AssociationRule> searched)
         {
-            using (var fs = new FileStream($@"C:\Users\leosm\Documents\Projects\TCC\RulesByMonthAnalyses\{timeStamp}_result.csv", FileMode.Append))
+            using (var fs = new FileStream($@"{outputPath}\result.csv", FileMode.Append))
             {
                 var fw = new StreamWriter(fs, Encoding.Default);
 
                 fw.WriteLine(
+                    $"TimeStamp;" +
                     $"Rule;" +
                     $"Support;" +
                     $"Confidence;" +
@@ -146,6 +165,7 @@ namespace AnalysingResults
                     foreach (var result in rule.Results)
                     {
                         fw.WriteLine(
+                            $"{rule.TimeStamp};" +
                             $"{rule.Rule};" +
                             $"{rule.Support};" +
                             $"{rule.Confidence};" +
@@ -166,16 +186,12 @@ namespace AnalysingResults
         {
             var termos = new List<string>()
             {
-                "vara+criminal",
-                "condena-se+crime",
-                "venha+ser+condenado",
-                "crime+representantes+penal",
-                "execução+penal",
-                "apelação+criminal",
-                "responsabilidade+penal",
-                "crime+cometido+representante",
-                "crimes+contra",
-                "tcu",
+                "tcu+fraude",
+                "tcu+licitação",
+                "tcu+ilicito",
+                "tcu+lavagem",
+                "tcu+conluio",
+                "tcu+cartel",
             };
 
             var url = "https://www.jusbrasil.com.br/busca?q=";
@@ -188,8 +204,11 @@ namespace AnalysingResults
                     string principal = Regex.Replace(association.Rule.Split('>')[1], @"\D", string.Empty);
                     string searchTerm = $"{principal}+{termo}";
 
+                    string target = $"{url}{searchTerm}";
+                    Console.WriteLine(target);
+
                     var web = new HtmlWeb();
-                    var doc = web.Load($"{url}{searchTerm}");
+                    var doc = web.Load(target);
 
                     ParseResults(association, searchTerm, doc);
                 }
@@ -201,6 +220,8 @@ namespace AnalysingResults
             var nodes = doc.DocumentNode.SelectNodes("//div[@class = 'SearchResults-documents']/div/div");
             if (nodes != null)
             {
+                Console.WriteLine($"{association.Rule} - {searchTerm}: {nodes.Count()} results");
+
                 foreach (var node in nodes)
                 {
                     var nodeTitle = node.SelectSingleNode("./h2/a");
@@ -219,10 +240,10 @@ namespace AnalysingResults
                     association.Results.Add(result);
                 }
             }
-            else if (doc.DocumentNode.SelectSingleNode("//span[contains(text(), 'não encontrou nenhum documento')]") == null)
-            {
-                throw new Exception("Erro inesperado, possível bloqueio de IP.");
-            }
+            //else if (doc.DocumentNode.SelectSingleNode("//span[contains(text(), 'não encontrou nenhum documento')]") == null)
+            //{
+            //    throw new Exception("Erro inesperado, possível bloqueio de IP.");
+            //}
         }
 
         private static IEnumerable<AssociationRule> GetAssociationRules(string[] list, string timeStamp)
